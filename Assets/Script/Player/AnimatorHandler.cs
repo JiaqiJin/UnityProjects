@@ -17,6 +17,7 @@ public class AnimatorHandler : MonoBehaviour
     }
     public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement)
     {
+        // 2D Blend Space 
         #region Vertical
         float v = 0;
 
@@ -67,6 +68,7 @@ public class AnimatorHandler : MonoBehaviour
         }
         #endregion
 
+        // Animator Set Blend Space Value
         anim.SetFloat(vertical, v, 0.1f, Time.deltaTime);
         anim.SetFloat(horizontal, h, 0.1f, Time.deltaTime);
     }
@@ -78,6 +80,6 @@ public class AnimatorHandler : MonoBehaviour
 
     public void StopRoration()
     {
-        canRotate = false;
+        canRotate = false;  
     }
 }
