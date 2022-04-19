@@ -5,8 +5,11 @@ using UnityEngine;
 public class AnimatorHandler : MonoBehaviour
 {
     public Animator anim;
-    public InputHandler inputHandler;
-    public PlayerLocomotion playerLocomotion;
+
+    PlayerManager playerManager;
+    InputHandler inputHandler;
+    PlayerLocomotion playerLocomotion;
+
     int vertical;
     int horizontal;
     public bool canRotate;
@@ -14,6 +17,7 @@ public class AnimatorHandler : MonoBehaviour
     public void Initialized()
     {
         anim = GetComponent<Animator>();
+        playerManager = GetComponentInParent<PlayerManager>();
         inputHandler = GetComponentInParent<InputHandler>();
         playerLocomotion = GetComponentInParent<PlayerLocomotion>();
 
@@ -29,7 +33,7 @@ public class AnimatorHandler : MonoBehaviour
         Debug.Log("Play");
     }
 
-    public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement)
+    public void UpdateAnimatorValues(float verticalMovement, float horizontalMovement, bool isSprinting)
     {
         // 2D Blend Space 
         #region Vertical
@@ -82,6 +86,12 @@ public class AnimatorHandler : MonoBehaviour
         }
         #endregion
 
+        if(isSprinting)
+        {
+            v = 2;
+            h = horizontalMovement;
+        }
+
         // Animator Set Blend Space Value
         anim.SetFloat(vertical, v, 0.1f, Time.deltaTime);
         anim.SetFloat(horizontal, h, 0.1f, Time.deltaTime);
@@ -99,7 +109,7 @@ public class AnimatorHandler : MonoBehaviour
 
     private void OnAnimatorMove()
     {
-        if (inputHandler.isInteracting == false)
+        if (playerManager.isInteracting == false)
             return;
 
         float delta = Time.deltaTime;
