@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+// RP asset is to give Unity a way to get a hold of a pipeline object instance that is responsible for rendering
+[CreateAssetMenu(menuName = "Rendering/Custom Render Pipeline")] 
 public class CustomRenderPipelineAsset : RenderPipelineAsset
 {
 	protected override RenderPipeline CreatePipeline()
 	{
-		return null;
+		return new CustomRenderPipeline();
 	}
 }
