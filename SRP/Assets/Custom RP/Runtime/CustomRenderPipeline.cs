@@ -7,13 +7,15 @@ using UnityEngine.Rendering;
 // https://docs.unity3d.com/ScriptReference/Rendering.RenderPipeline.html
 public class CustomRenderPipeline : RenderPipeline 
 {
-	CameraRender renderer = new CameraRender();
+	CameraRender cameraRenderer = new CameraRender();
 
-	protected override void Render(ScriptableRenderContext context, Camera[] cameras)
-	{
-		foreach (Camera camera in cameras)
+    //Each frame Unity invokes Render on the RP instance
+    protected override void Render(ScriptableRenderContext context, Camera[] cameras)
+    {
+        for (int i = 0; i < cameras.Length; i++)
         {
-			renderer.Render(context, camera);
+            var camera = cameras[i];
+            cameraRenderer.Render(context, camera);
         }
-	}
+    }
 }
