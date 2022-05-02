@@ -25,12 +25,21 @@ public partial class CameraRender
 		this.context = context;
 		this.camera = camera;
 
+		PrepareBuffer();
+		PrepareForSceneWindow();
+
 		if (!Cull())
 			return;
 
 		SetUp();
+
+		// Context are buffered (not draw before submitting)
 		DrawVisibleGeometry();
+		//Draw Unsupported Meshes
 		DrawUnsupportedShaders();
+		// Draw Gizmos
+		DrawGizmos();
+
 		Submit();
 	}
 
@@ -61,11 +70,18 @@ public partial class CameraRender
 		// Set Up view-projection matrix.
 		context.SetupCameraProperties(camera);
 
+		// Clear Flag
+		CameraClearFlags flags = camera.clearFlags;
+
 		//Clearing the Render Target
-		commandBuffer.ClearRenderTarget(true, true, Color.clear);
+		commandBuffer.ClearRenderTarget(
+			flags <= CameraClearFlags.Depth, // if nothing =>  not clear
+			flags == CameraClearFlags.Color,  // if it is color =>  clear with color
+			flags == CameraClearFlags.Color ? camera.backgroundColor.linear : Color.clear // transparent or color
+			);
 
 		// Inject profiler samples
-		commandBuffer.BeginSample(bufferName);
+		commandBuffer.BeginSample(SampleName);
 
 		ExcuteBuffer();	
     }
@@ -73,7 +89,7 @@ public partial class CameraRender
 	// submit the queued work for execution
 	void Submit()
     {
-		commandBuffer.EndSample(bufferName);
+		commandBuffer.EndSample(SampleName);
 		ExcuteBuffer();
 		context.Submit();
     }

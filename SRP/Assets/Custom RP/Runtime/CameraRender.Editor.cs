@@ -7,8 +7,19 @@ using UnityEngine.Profiling;
 
 public partial class CameraRender
 {
+    partial void DrawUnsupportedShaders();
+
+    partial void DrawGizmos();
+
+    partial void PrepareForSceneWindow(); // Add the UI to the world geometry when rendering for the scene window
+
+    partial void PrepareBuffer();
+
 #if UNITY_EDITOR
-    // all Unity's default shaders ID
+    string SampleName { get; set; }
+
+    static Material errorMaterial;
+
     static ShaderTagId[] legacyShaderTagIds = {
         new ShaderTagId("Always"),
         new ShaderTagId("ForwardBase"),
@@ -17,18 +28,53 @@ public partial class CameraRender
         new ShaderTagId("VertexLMRGBM"),
         new ShaderTagId("VertexLM")
     };
-#endif
-    void DrawUnsupportedShaders()
+
+    partial void DrawUnsupportedShaders()
     {
-        var drawingSettings = new DrawingSettings(legacyShaderTagIds[0], new SortingSettings(camera));
-     
-        for (int i = 1; i < legacyShaderTagIds.Length; i++)
+        if (errorMaterial == null)
         {
-            drawingSettings.SetShaderPassName(i, legacyShaderTagIds[i]);
+            errorMaterial = new Material(Shader.Find("Hidden/InternalErrorShader"));
         }
 
+
+        var drawSettings = new DrawingSettings(legacyShaderTagIds[0], new SortingSettings(camera))
+        {
+            overrideMaterial = errorMaterial
+        };
+
+        for (int i = 1; i < legacyShaderTagIds.Length; i++)
+        {
+            drawSettings.SetShaderPassName(i, legacyShaderTagIds[i]);
+        }
         var filteringSettings = FilteringSettings.defaultValue;
-        context.DrawRenderers(cullingResults, ref drawingSettings, ref filteringSettings);
+        context.DrawRenderers(cullingResults, ref drawSettings, ref filteringSettings);
     }
+
+    partial void DrawGizmos()
+    {
+        if(Handles.ShouldRenderGizmos())
+        {
+            context.DrawGizmos(camera, GizmoSubset.PreImageEffects);
+            context.DrawGizmos(camera, GizmoSubset.PostImageEffects);
+        }
+    }
+
+    partial void PrepareForSceneWindow()
+    {
+        if (camera.cameraType == CameraType.SceneView)
+        {
+            ScriptableRenderContext.EmitWorldGeometryForSceneView(camera);
+        }
+    }
+
+    partial void PrepareBuffer()
+    {
+        Profiler.BeginSample("Editor Only");
+        commandBuffer.name = camera.name = SampleName;
+        Profiler.EndSample();
+    }
+#else
+    string SampleName => bufferName
+#endif
 
 }
