@@ -7,7 +7,12 @@ using UnityEngine.Rendering;
 // https://docs.unity3d.com/ScriptReference/Rendering.RenderPipeline.html
 public class CustomRenderPipeline : RenderPipeline 
 {
-	CameraRender cameraRenderer = new CameraRender();
+    public CustomRenderPipeline(bool useSRPBatcher)
+    {
+        GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
+    }
+
+    CameraRender cameraRenderer = new CameraRender();
 
     //Each frame Unity invokes Render on the RP instance
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
