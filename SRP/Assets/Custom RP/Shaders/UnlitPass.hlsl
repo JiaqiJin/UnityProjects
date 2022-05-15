@@ -19,7 +19,7 @@ UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
 	UNITY_DEFINE_INSTANCED_PROP(float4, _BaseColor)
 UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
 
-Varyings UnlitPassVertex(Attributes input) : SV_POSITION
+Varyings UnlitPassVertex(Attributes input)
 {
 	Varyings output;
 	UNITY_SETUP_INSTANCE_ID(input); // Extracts the index from the input and store in a global static variable 
